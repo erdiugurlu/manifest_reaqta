@@ -23,15 +23,6 @@ spec:
         ports:
         - name: http
           containerPort: 8080
-  strategy:
-    canary:
-      steps:
-      - setWeight: 20
-      - pause:
-          duration: "30s"
-      - setWeight: 50
-      - pause:
-          duration: "30s"
 
 ---
 apiVersion: v1
