@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,7 +7,8 @@ metadata:
   labels:
     app: hello-world
 spec:
-  replicas: 1
+  replicas: 3
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
       app: hello-world
@@ -17,7 +19,29 @@ spec:
     spec:
       containers:
       - name: hello-world
-        image: erdiugurlu/reaqta-helloworld:0.10
+        image: erdiugurlu/reaqta-helloworld:1.0
         ports:
-        - containerPort: 8080
+        - name: http
+          containerPort: 8080
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20
+      - pause:
+          duration: "30s"
+      - setWeight: 50
+      - pause:
+          duration: "30s"
 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+  namespace: reaqta
+spec:
+  ports:
+  - port: 8080
+  selector:
+    app: hello-world
+  type: LoadBalancer
